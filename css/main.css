@@ -29,6 +29,14 @@
   cursor: pointer;
 }
 
+.card-img-top {
+  height: 400px;
+}
+
+.card-title {
+  height: 40px;
+}
+
 .loaders {
   margin: 50px auto;
 }
@@ -41,6 +49,11 @@
 
 .custom-select {
   margin-bottom: 10px;
+}
+
+.social-network a{
+  font-size: 40px;
+  margin: 0 10px;
 }
 
 .footer {

@@ -5,7 +5,7 @@ session_start();
   $email     = $_POST['email'];
   $pass      = $_POST['password'];
   $user      = $_POST['username'];
-  $user_type = 'member';
+  $user_type = $_POST['user_type'];
 
   include 'connection.php';
 
@@ -17,7 +17,7 @@ session_start();
 
 
   if(mysqli_query($connect, $sql)){
-      header("location:../login.php");
+      header("location:../users.php");
   }else {
       echo "Neuspješno upisivanje u bazu ";
   }

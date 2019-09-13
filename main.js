@@ -2,7 +2,7 @@ Vue.component("Navbar", {
   template: `
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
       <div class="container">
-        <a class="navbar-brand" href="#">Knižara Mali Princ</a>
+        <a class="navbar-brand" href="#">Knjižara Mali Princ</a>
         <button
           class="navbar-toggler"
           type="button"
@@ -19,7 +19,7 @@ Vue.component("Navbar", {
           <ul class="navbar-nav mr-auto">
             <li class="nav-item active">
               <a class="nav-link" href="index.php">
-                Home
+                Početna
                 <span class="sr-only">(current)</span>
               </a>
             </li>
@@ -35,6 +35,7 @@ Vue.component("Navbar", {
           </ul>
           <div>
           <a class="btn btn-success" href="login.php"">Prijava</a>
+          <a v-if="" class="btn btn-outline-info" href="php/logout.php"">Odjavi se</a>
           </div>
         </div>
       </div>
@@ -43,15 +44,38 @@ Vue.component("Navbar", {
 });
 
 Vue.component("Book", {
-  props: ['book', 'member'],
+  props: ['book', 'member', 'my-books'],
+  methods: {
+    addUserBook(book) {
+      let userBook = {
+        title    : book.title,
+        author   : book.author,
+        cover    : book.cover,
+        book_link: book.book_link
+      }
+      if (confirm(`Dodaj ${book.title} u 'Moje Knjige'`)) {
+        fetch("php/addUserBook.php", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify(userBook)
+        }).then(response => console.log('added'));
+      } else {
+        return false;
+      }
+    },
+  },
   template: `<div class="card" style="width: 18rem;">
-  <img :src="book.cover" class="card-img-top" alt="..."> 
+  <img :src="book.cover" class="card-img-top" alt="book img"> 
   <div class="card-body">
     <h5 class="card-title">{{book.title}}</h5>
     <p
       class="card-text"
-    >Some quick example text to build on the card title and make up the bulk of the card's content.</p>
-    <a href="#" v-if="member" class="btn btn-primary">Go somewhere</a>
+    >{{book.author}}</p>
+    <a href="#" v-if="member" class="btn btn-primary" @click="addUserBook(book)">Dodaj</a>
+    <a :href="book.book_link" target="_blank" v-if="myBooks" class="btn btn-primary">Otvori</a>
+
   </div>
 </div>`
 });
@@ -112,9 +136,11 @@ Vue.component('Loader', {
 new Vue({
   el: "#app",
   data: {
-    books: [],
-    search: '',
-    member: 'true'
+    books    : [],
+    userBooks: [],
+    search   : '',
+    member   : 'true',
+    myBooks  : 'true'
   },
   computed: {
     filterBooks() {
@@ -126,12 +152,18 @@ new Vue({
   methods: {
     fetchBooks() {
       fetch('./php/fetchBooks.php')
-        .then(res => res.json())
-        .then(data => this.books = data)
+        .then(response => response.json())
+        .then(data     => this.books = data)
+    },
+    fetchUserBooks() {
+      fetch('./php/fetchUserBooks.php')
+        .then(response => response.json())
+        .then(data     => this.userBooks = data)
     },
   },
   created() {
     this.fetchBooks();
+    this.fetchUserBooks();
   }
 });
 

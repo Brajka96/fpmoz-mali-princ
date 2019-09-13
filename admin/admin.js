@@ -1,95 +1,72 @@
-Vue.component("v-table-users", {
-  props: ['users'],
-  data() {
-    return {
-      
-    };
-  },
-  computed: {
-    templateObject() {
-      return Object.keys(this.users[0]);
-    }
-  },
+Vue.component("Loader", {
   template: `
-    <table class="table">
-    <thead class="thead-primary bg-primary text-white">
-      <tr>
-        <th scope="col" v-for="(key, val) in templateObject" :key="key">
-          {{key}}
-        </th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr v-for="user in users" :key="user.id">
-        <th scope="row">{{user.id}}</th>
-        <td>{{user.full_name}}</td>
-        <td>{{user.email}}</td>
-        <td>{{user.password}}</td>
-        <td>{{user.username}}</td>
-        <td>{{user.user_type}}</td>
-      </tr>
-    </tbody>
-  </table>
-  
-    `
+  <div>
+  <div class="spinner-grow text-danger" role="status">
+  <span class="sr-only">Loading...</span>
+</div>
+<div class="spinner-grow text-warning" role="status">
+  <span class="sr-only">Loading...</span>
+</div>
+<div class="spinner-grow text-info" role="status">
+  <span class="sr-only">Loading...</span>
+</div></div>
+  `
 });
-
-Vue.component("v-table-books", {
-  props: ['books'],
-  data() {
-    return {
-      
-    };
-  },
-  computed: {
-    templateObject() {
-      return Object.keys(this.books[0]);
-    }
-  },
-  template: `
-    <table class="table">
-    <thead class="thead-primary bg-primary text-white">
-      <tr>
-        <th scope="col" v-for="(key, val) in templateObject" :key="key">
-          {{key}}
-        </th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr v-for="book in books" :key="book.id">
-        <th scope="row">{{book.id}}</th>
-        <td>{{book.title}}</td>
-        <td>{{book.price}}</td>
-        <td>{{book.cover}}</td>
-      </tr>
-    </tbody>
-  </table>
-  
-    `
-});
-
 
 new Vue({
   el: "#admin",
   data: {
-    users: [],
-    books: [],
+    users     : [],
+    books     : [],
+    singleUser: {},
+    singleBook: {}
   },
   methods: {
     fetchUsers() {
-      fetch('../php/users.php')
+      fetch("../php/users.php")
         .then(res => res.json())
-        .then(data => this.users = data)
+        .then(data => (this.users = data));
     },
     fetchBooks() {
-      fetch('../php/fetchBooks.php')
+      fetch("../php/fetchBooks.php")
         .then(res => res.json())
-        .then(data => this.books = data)
+        .then(data => (this.books = data));
     },
+    deleteUser(user) {
+      if (confirm("Jeste li sigurni da zelite obrisati " + user.full_name)) {
+        fetch("phpAdmin/deleteUser.php", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({ id: user.id })
+        }).then(response => this.fetchUsers());
+      } else {
+        return false;
+      }
+    },
+    deleteBook(book) {
+      if (confirm("Jeste li sigurni da zelite obrisati " + book.title)) {
+        fetch("phpAdmin/deleteBook.php", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({ id: book.id })
+        }).then(response => this.fetchBooks());
+      } else {
+        return false;
+      }
+    },
+    editUser(user) {
+      this.singleUser = user;
+    },
+    editBook(book) {
+      this.singleBook = book;
+    }
   },
   created() {
     this.fetchUsers();
     this.fetchBooks();
   }
-
 });

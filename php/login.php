@@ -25,7 +25,7 @@
             $rows = mysqli_num_rows($query);
             if($rows==1){
                 $_SESSION['login_user'] = $user;
-                $_SESSION['user_type'] = $user_type;
+                $_SESSION['user_type']  = $user_type;
             }
             else{
                 $error="Korisničko ime ili šifra nisu točni";
